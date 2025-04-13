@@ -305,14 +305,14 @@ def handles_event(event):
 
 
 class Game:
-    def __init__(self) -> None:
+    def __init__(self, server_ip="127.0.0.1", server_port=547) -> None:
         self.started = False
         self.player = 1
         self.winner = None
         self.board = [[0] * 15 for i in range(15)]
         self.down = (-1, -1)
         self.clock = pygame.time.Clock()
-        self.server = ConnectionServer()
+        self.server = ConnectionServer(server_ip, server_port)
 
     def start(self):
         # 绘制背景
@@ -780,7 +780,7 @@ class Game:
         return get
 
 
-game = Game()
+game = Game("39.107.242.163")
 button = Button(
     margins,
     width,
@@ -831,7 +831,6 @@ button_quit = Button(
     (224, 55, 51),
     (255, 255, 255),
 )
-n = 1
 
 
 while True:
