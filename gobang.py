@@ -6,6 +6,8 @@ import os
 import copy
 import sys
 import json
+import tkinter as tk
+from tkinter import messagebox
 
 
 try:
@@ -837,9 +839,15 @@ while True:
         if event.type == pygame.USEREVENT:
             if hasattr(event, "dict") and "action" in event.dict:
                 if event.dict["action"] == "show_info":
-                    info(event.dict["title"], event.dict["message"])
+                    root = tk.Tk()
+                    root.withdraw()
+                    messagebox.showinfo(event.dict["title"], event.dict["message"])
+                    root.destroy()
                 elif event.dict["action"] == "show_warning":
-                    warning(event.dict["title"], event.dict["message"])
+                    root = tk.Tk()
+                    root.withdraw()
+                    messagebox.showwarning(event.dict["title"], event.dict["message"])
+                    root.destroy()
         elif event.type == pygame.QUIT:
             game.server.close()
             pygame.quit()
