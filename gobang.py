@@ -334,7 +334,7 @@ class Game:
                 2,
             )  # 绘制横线
         pygame.draw.circle(
-            screen, "#000000", [margins + 7 * spacing, margins + 7 * spacing], 6
+            screen, "#000000", [margins + 7 * spacing, margins + 7 * spacing], 8
         )  # 天元
         pygame.draw.circle(
             screen, "#000000", [margins + 3 * spacing, margins + 3 * spacing], 6
@@ -346,7 +346,10 @@ class Game:
             screen, "#000000", [margins + 3 * spacing, width - margins - 3 * spacing], 6
         )  # 左下角星位
         pygame.draw.circle(
-            screen, "#000000", [width - margins - 3 * spacing, width - margins - 3 * spacing], 6
+            screen,
+            "#000000",
+            [width - margins - 3 * spacing, width - margins - 3 * spacing],
+            6,
         )  # 右下角星位
         # 绘制提示框
         if self.down != (-1, -1):
