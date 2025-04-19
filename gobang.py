@@ -6,6 +6,7 @@ import os
 import copy
 import sys
 import json
+from itertools import repeat
 import tkinter as tk
 from tkinter import messagebox
 
@@ -35,6 +36,7 @@ def warning(title, message):
             pygame.USEREVENT,
             {"action": "show_warning", "title": title, "message": message},
         )
+        pygame.event.post(event)
 
     threading.Thread(target=show_warning_in_main_thread).start()
 
@@ -108,6 +110,7 @@ class ConnectionServer:
             player_number = message.get("player_number")
             if player_id != self.player_id:
                 game.board[col][row] = player_number
+                game.steps.append((col, row, player_number))
                 game.down = (col, row)
                 game.player = self.player_number  # 轮到自己落子
 
@@ -240,7 +243,8 @@ def handles_event(event):
                 if game.winner != 0:
                     game.player = 1
                     game.winner = None
-                    game.board = [[0] * 15 for i in range(15)]
+                    game.board = [[0] * 15 for _ in repeat(None, 15)]
+                    game.steps = []
                     game.down = (-1, -1)
         elif button_ai.rect.collidepoint(event.pos):
             if (
@@ -253,7 +257,8 @@ def handles_event(event):
                 if game.winner != 0:
                     game.player = 1
                     game.winner = None
-                    game.board = [[0] * 15 for i in range(15)]
+                    game.board = [[0] * 15 for _ in repeat(None, 15)]
+                    game.steps = []
                     game.down = (-1, -1)
         elif button_room.rect.collidepoint(event.pos):
             global n
@@ -276,7 +281,8 @@ def handles_event(event):
                 if game.winner != 0:
                     game.player = 1
                     game.winner = None
-                    game.board = [[0] * 15 for i in range(15)]
+                    game.board = [[0] * 15 for _ in repeat(None, 15)]
+                    game.steps = []
                     game.down = (-1, -1)
         elif button_restart.rect.collidepoint(event.pos):
             if button.clicked or button_ai.clicked or button_room.clicked:
@@ -296,7 +302,8 @@ def handles_event(event):
                 game.started = False
                 game.player = 1
                 game.winner = None
-                game.board = [[0] * 15 for i in range(15)]
+                game.board = [[0] * 15 for _ in repeat(None, 15)]
+                game.steps = []
                 game.down = (-1, -1)
         elif button_quit.rect.collidepoint(event.pos):
             game.server.close()
@@ -309,7 +316,8 @@ class Game:
         self.started = False
         self.player = 1
         self.winner = None
-        self.board = [[0] * 15 for i in range(15)]
+        self.board = [[0] * 15 for _ in repeat(None, 15)]
+        self.steps = []
         self.down = (-1, -1)
         self.clock = pygame.time.Clock()
         self.server = ConnectionServer(server_ip, server_port)
@@ -377,6 +385,21 @@ class Game:
                         [col * spacing + margins, row * spacing + margins],
                         margins - 2,
                     )
+        # 绘制步数
+        for i in range(1, len(self.steps) + 1):
+            if self.steps[i - 1][2] == 1:
+                color = "#FFFFFF"
+            else:
+                color = "#000000"
+            font = pygame.font.Font(
+                os.path.join(folder, "data", "simhei.ttf"), int(spacing / 2)
+            )
+            text_surface = font.render(str(i), True, color)
+            text_position = (
+                (margins + spacing * self.steps[i - 1][0] - font.size(str(i))[0] / 2),
+                (margins + spacing * self.steps[i - 1][1] - font.size(str(i))[1] / 2),
+            )
+            screen.blit(text_surface, text_position)
 
         # 绘制赢家
         if self.winner:
@@ -413,6 +436,7 @@ class Game:
                     if self.board[col][row] == 0:
                         self.down = (col, row)
                         self.board[col][row] = self.player
+                        self.steps.append((col, row, self.player))
                         if self.five():
                             self.winner = (
                                 "黑子赢了！" if self.player == 1 else "白子赢了！"
@@ -424,6 +448,7 @@ class Game:
                     pos = (col, row)
                     if self.valid_input(pos):
                         self.board[col][row] = 1
+                        self.steps.append((col, row, 1))
                         if self.five() or not self.get_valid_move():
                             self.winner = "你赢了！" if self.five() else "平局！"
                         else:
@@ -440,12 +465,14 @@ class Game:
                                 # 更新本地棋盘
                                 self.down = (col, row)
                                 self.board[col][row] = self.player
+                                self.steps.append((col, row, self.player))
                                 # 切换玩家（服务器会通过消息再次切换回来）
                                 self.player = abs(self.player - 3)
 
     def ai_down(self):
         move = self.get_pos(self.board)
         self.board[move[0]][move[1]] = 2
+        game.steps.append((move[0], move[1], 2))
         self.down = move
         if self.five():
             self.winner = "你赢了！" if self.five() == 1 else "AI赢了！"
@@ -755,7 +782,7 @@ class Game:
         return self.get_line_score([h, s, lx, rx])
 
     def opp_board(self, board):
-        o_board = [[0] * 15 for i in range(15)]
+        o_board = [[0] * 15 for _ in repeat(None, 15)]
 
         for i in range(15):
             for j in range(15):
@@ -838,16 +865,13 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.USEREVENT:
             if hasattr(event, "dict") and "action" in event.dict:
+                root = tk.Tk()
+                root.withdraw()
                 if event.dict["action"] == "show_info":
-                    root = tk.Tk()
-                    root.withdraw()
                     messagebox.showinfo(event.dict["title"], event.dict["message"])
-                    root.destroy()
                 elif event.dict["action"] == "show_warning":
-                    root = tk.Tk()
-                    root.withdraw()
                     messagebox.showwarning(event.dict["title"], event.dict["message"])
-                    root.destroy()
+                root.destroy()
         elif event.type == pygame.QUIT:
             game.server.close()
             pygame.quit()
