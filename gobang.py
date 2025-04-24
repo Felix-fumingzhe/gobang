@@ -163,11 +163,12 @@ class ConnectionServer:
     def quit_room(self):
         # 退出房间
         if not self.is_connected or not self.is_matched:
-            return
-
-        self.send_message({"type": "quit"})
+            self.send_message({"type": "quit_now"})
+        else:
+            self.send_message({"type": "quit"})
         self.is_matched = False
         self.room_id = None
+
 
     def close(self):
         # 关闭连接
