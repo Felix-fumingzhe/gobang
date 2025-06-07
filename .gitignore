@@ -138,3 +138,4 @@ dmypy.json
 cython_debug/
 
 五子棋_exe.bat
+test.py

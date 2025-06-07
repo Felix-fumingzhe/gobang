@@ -16,4 +16,4 @@ jobs:
           spec: 'gobang.py'
           requirements: "requirements.txt"
           upload_exe_with_name: 'gobang'
-          options: --onefile, --name "gobang", -w, -i "gobang.ico", --add-data "data/gobang.png:data", --add-data "data/bgm.mp3:data", --add-data "data/simhei.ttf:data"
+          options: --onefile, --name "gobang", -w, -i "gobang.icns", --add-data "data/gobang.png:data", --add-data "data/bgm.mp3:data", --add-data "data/simhei.ttf:data"
