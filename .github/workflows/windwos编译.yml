@@ -15,4 +15,4 @@ jobs:
           python_ver: '3.12'
           spec: 'gobang.py'
           upload_exe_with_name: 'gobang'
-          options: --onefile, --name "gobang", -w, -i "gobang.ico", --add-data "data/gobang.png;data", --add-data "data/bgm.mp3;data", --add-data "data/simhei.ttf;data"
+          options: --onefile, --name "gobang", -w, -i "gobang.ico", --add-data "data/gobang.png;data", --add-data "data/bgm.mp3;data", --add-data "data/simhei.ttf;data", --hidden-import=pygame
