@@ -1,4 +1,5 @@
 import threading
+import os
 import socket
 import random
 import json
@@ -18,6 +19,7 @@ class ChatServer:
         self.tcp_server.listen(128)
         print("服务器已开启,正在等待用户连接...")
         while True:
+            print(self.rooms)
             new_tcp_client, client_info = self.tcp_server.accept()
             print(f"新连接: {client_info}")
             threading.Thread(
@@ -69,6 +71,9 @@ class ChatServer:
 
         elif message_type == "quit":
             self.handle_quit_room(player_id)
+
+        elif message_type == "quit_now":
+            self.handle_quit_now(player_id)
 
     def match_player(self, player_id):
         if self.players[player_id]["room_id"] is not None:
@@ -227,6 +232,11 @@ class ChatServer:
 
         self.players[player_id]["room_id"] = None
         self.players[player_id]["status"] = "waiting"
+
+    def handle_quit_now(self, player_id):
+        if player_id in self.players:
+            if player_id in self.waiting_players:
+                self.waiting_players.remove(player_id)
 
     def handle_disconnect(self, player_id):
 
