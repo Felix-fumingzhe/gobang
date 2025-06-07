@@ -203,7 +203,7 @@ pygame.mixer.music.load(os.path.join(folder, "data", "bgm.mp3"))
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.5)
 # 设置窗口图标
-icon = pygame.image.load(os.path.join(folder, "data", "icon.png"))
+icon = pygame.image.load(os.path.join(folder, "data", "gobang.png"))
 pygame.display.set_icon(icon)
 
 
