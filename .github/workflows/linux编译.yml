@@ -1,4 +1,4 @@
-name: 编译windows程序
+name: 编译linux序
 on:
   workflow_dispatch:
 
